@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>将棋UI</title>
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  font-family: sans-serif;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(9, 60px);
+  grid-template-rows: repeat(9, 60px);
+  border: 2px solid black;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #f4d9a0;
+}
+
+.selected {
+  background-color: yellow;
+}
+
+.piece {
+  font-size: 22px;
+  user-select: none;
+}
+
+.enemy {
+  transform: rotate(180deg);
+  color: red;
+}
+</style>
+</head>
+<body>
+
+<div id="board"></div>
+
+<script>
+const boardElement = document.getElementById("board");
+
+// 駒データ
+function piece(type, player) {
+  return { type, player };
+}
+
+// 初期配置
+let board = [
+  [piece("香",2),piece("桂",2),piece("銀",2),piece("金",2),piece("王",2),piece("金",2),piece("銀",2),piece("桂",2),piece("香",2)],
+  [null,piece("飛",2),null,null,null,null,null,piece("角",2),null],
+  Array(9).fill(piece("歩",2)),
+  Array(9).fill(null),
+  Array(9).fill(null),
+  Array(9).fill(null),
+  Array(9).fill(piece("歩",1)),
+  [null,piece("角",1),null,null,null,null,null,piece("飛",1),null],
+  [piece("香",1),piece("桂",1),piece("銀",1),piece("金",1),piece("王",1),piece("金",1),piece("銀",1),piece("桂",1),piece("香",1)]
+];
+
+let selected = null;
+
+// 描画
+function render() {
+  boardElement.innerHTML = "";
+
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      if (selected && selected.x === x && selected.y === y) {
+        cell.classList.add("selected");
+      }
+
+      cell.onclick = () => onClick(x, y);
+
+      const p = board[y][x];
+      if (p) {
+        const pieceDiv = document.createElement("div");
+        pieceDiv.className = "piece";
+        pieceDiv.textContent = p.type;
+
+        if (p.player === 2) {
+          pieceDiv.classList.add("enemy");
+        }
+
+        cell.appendChild(pieceDiv);
+      }
+
+      boardElement.appendChild(cell);
+    }
+  }
+}
+
+// クリック処理（まだルールなし）
+function onClick(x, y) {
+  if (selected) {
+    board[y][x] = board[selected.y][selected.x];
+    board[selected.y][selected.x] = null;
+    selected = null;
+  } else {
+    if (board[y][x]) {
+      selected = { x, y };
+    }
+  }
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
